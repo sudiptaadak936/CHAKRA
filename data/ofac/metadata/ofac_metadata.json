@@ -1,0 +1,48 @@
+{
+  "dataset": "OFAC SDN Enhanced List",
+  "source": "U.S. Department of the Treasury, Office of Foreign Assets Control (OFAC)",
+  "source_url": "https://ofac.treasury.gov/specially-designated-nationals-list-data-formats-data-schemas",
+  "original_filename": "sdn_enhanced.zip",
+  "acquisition_note": "Downloaded from public OFAC website. No account or API key required.",
+  "sha256": "d73cf051982817475dba25f982f959aad355d145831558e7b36d22de39462361",
+  "file_size_bytes": 6727094,
+  "archive_contents": [
+    {
+      "filename": "SDN_ENHANCED.XML",
+      "compressed_size": 6726964,
+      "uncompressed_size": 108997457
+    }
+  ],
+  "primary_xml_file": "SDN_ENHANCED.XML",
+  "processed_at": "2026-09-03T16:48:52.919563+00:00",
+  "processing_status": "complete",
+  "errors": [],
+  "record_counts": {
+    "total_crypto_address_records": 1007,
+    "distinct_sdn_entries_with_crypto": 1007,
+    "by_currency_type": {
+      "Digital Currency Address - TRX": 202,
+      "Digital Currency Address - XMR": 11,
+      "Digital Currency Address - USDT": 94,
+      "Digital Currency Address - XBT": 534,
+      "Digital Currency Address - ETH": 120,
+      "Digital Currency Address - LTC": 14,
+      "Digital Currency Address - ETC": 1,
+      "Digital Currency Address - ZEC": 4,
+      "Digital Currency Address - DASH": 5,
+      "Digital Currency Address - BTG": 1,
+      "Digital Currency Address - BSV": 1,
+      "Digital Currency Address - BCH": 7,
+      "Digital Currency Address - XVG": 1,
+      "Digital Currency Address - XRP": 1,
+      "Digital Currency Address - ARB": 1,
+      "Digital Currency Address - BSC": 1,
+      "Digital Currency Address - USDC": 2,
+      "Digital Currency Address - SOL": 4,
+      "Digital Currency Address - DOGE": 2,
+      "Digital Currency Address - BNB": 1
+    }
+  },
+  "schema_notes": "SDN Enhanced XML schema v2.x. Crypto addresses are stored as 'Digital Currency Address - <TICKER>' feature types within <featureList> elements of each <sdnEntry>.",
+  "license_note": "OFAC SDN data is a U.S. government publication and is in the public domain. Re-use is permitted. Attribution to OFAC/Treasury is recommended."
+}

@@ -1,0 +1,85 @@
+{
+  "validated_at": "2026-09-03T16:49:38.699294+00:00",
+  "status": "pass",
+  "errors": [],
+  "warnings": [],
+  "files": {
+    "features": {
+      "file": "elliptic_txs_features.csv",
+      "exists": true,
+      "readable": true,
+      "size_bytes": 689683771,
+      "sha256": "fd7f83573443c9e302e371d3f110e3b6224160f5d1ed8a287757936127800ff0",
+      "row_count": 203769,
+      "column_count": 167,
+      "unique_tx_ids": 203769,
+      "duplicate_rows": 0,
+      "nulls": {
+        "total_null_cells": 0,
+        "columns_with_nulls": {}
+      }
+    },
+    "classes": {
+      "file": "elliptic_txs_classes.csv",
+      "exists": true,
+      "readable": true,
+      "size_bytes": 3305144,
+      "sha256": "93e2e7b2405c735ba752bf6ba06b947561deddd1f5a8fc91e46f6a4c0e439493",
+      "row_count": 203769,
+      "columns": [
+        "txId",
+        "class"
+      ],
+      "unique_tx_ids": 203769,
+      "duplicate_tx_ids": 0,
+      "label_distribution": {
+        "unknown": 157205,
+        "2": 42019,
+        "1": 4545
+      },
+      "class_labels_found": [
+        "1",
+        "2",
+        "unknown"
+      ],
+      "class_labels_expected": [
+        "1",
+        "2",
+        "unknown"
+      ],
+      "nulls": {
+        "total_null_cells": 0,
+        "columns_with_nulls": {}
+      }
+    },
+    "edgelist": {
+      "file": "elliptic_txs_edgelist.csv",
+      "exists": true,
+      "readable": true,
+      "size_bytes": 4470584,
+      "sha256": "a35053ba68a98e4382cae2ba65b9d9e36b23b6439e02dff084971b1b72a5156e",
+      "row_count": 234355,
+      "columns": [
+        "txId1",
+        "txId2"
+      ],
+      "duplicate_edges": 0,
+      "nulls": {
+        "total_null_cells": 0,
+        "columns_with_nulls": {}
+      }
+    }
+  },
+  "cross_file_validation": {
+    "features_vs_classes": {
+      "feature_tx_count": 203769,
+      "class_tx_count": 203769,
+      "in_classes_not_in_features": 0,
+      "in_features_not_in_classes": 0
+    },
+    "edgelist_vs_features": {
+      "unique_edge_nodes": 203769,
+      "edge_nodes_not_in_features": 0
+    }
+  }
+}

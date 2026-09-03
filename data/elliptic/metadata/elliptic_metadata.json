@@ -1,0 +1,32 @@
+{
+  "dataset": "Elliptic Bitcoin Transaction Dataset",
+  "authors": "Weber, M., Domeniconi, G., Chen, J., Weidele, D.K.I., Bellei, C., Robinson, T., Leiserson, C.E.",
+  "paper": "Anti-Money Laundering in Bitcoin: Experimenting with Graph Neural Networks for Financial Forensics",
+  "venue": "KDD 2019 Workshop on Anomaly Detection in Finance",
+  "source_url": "https://www.kaggle.com/datasets/ellipticco/elliptic-data-set",
+  "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "description": "203 timestep Bitcoin transaction graph with ground-truth licit/illicit labels. Node features are anonymized. Class 1 = illicit, Class 2 = licit, unknown = unlabelled.",
+  "files": {
+    "features": {
+      "filename": "elliptic_txs_features.csv",
+      "sha256": "fd7f83573443c9e302e371d3f110e3b6224160f5d1ed8a287757936127800ff0",
+      "size_bytes": 689683771,
+      "row_count": 203769
+    },
+    "classes": {
+      "filename": "elliptic_txs_classes.csv",
+      "sha256": "93e2e7b2405c735ba752bf6ba06b947561deddd1f5a8fc91e46f6a4c0e439493",
+      "size_bytes": 3305144,
+      "row_count": 203769
+    },
+    "edgelist": {
+      "filename": "elliptic_txs_edgelist.csv",
+      "sha256": "a35053ba68a98e4382cae2ba65b9d9e36b23b6439e02dff084971b1b72a5156e",
+      "size_bytes": 4470584,
+      "row_count": 234355
+    }
+  },
+  "processed_at": "2026-09-03T16:49:38.700705+00:00",
+  "processing_note": "Validation only. No raw data was copied, modified, or redistributed. No ML model was trained."
+}
