@@ -38,8 +38,8 @@ dist-ssr/
 
 # Environment & Secrets
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 *.pem
 *.key
 
@@ -55,6 +55,7 @@ redis_data/
 *.swo
 .DS_Store
 Thumbs.db
-.env
-.env.*
-!.env.example
+
+# Large blockchain datasets
+data/elliptic/raw/elliptic_txs_features.csv
+
