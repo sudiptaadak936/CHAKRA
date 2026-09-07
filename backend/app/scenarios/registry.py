@@ -36,9 +36,9 @@ class ScenarioRegistry:
             DuplicateScenarioError: If the scenario_id is already registered.
         """
         sid = generator.scenario_id
-        if not sid or not re.match(r"^[a-z0-9_]+$", sid):
+        if not isinstance(sid, str) or not re.match(r"^[a-z0-9_]+$", sid):
             raise InvalidScenarioIdError(
-                f"Invalid scenario ID format: '{sid}'. Must be lowercase alphanumeric and underscores."
+                f"Invalid scenario ID format: '{sid}'. Must be a non-empty string of lowercase alphanumeric characters and underscores."
             )
             
         if sid in self._generators:

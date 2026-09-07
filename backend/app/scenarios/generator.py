@@ -7,6 +7,10 @@ from app.schemas.transaction import Transaction
 class ScenarioGenerator(abc.ABC):
     """Base protocol for deterministic scenario generators.
     
+    Architectural invariant:
+        A generator with identical configuration produces the same ordered
+        transaction sequence on repeated invocation.
+        
     A scenario generator generates input data (canonical Transaction objects)
     and does NOT perform forensic analysis.
     """
@@ -21,7 +25,11 @@ class ScenarioGenerator(abc.ABC):
     def generate(self) -> List[Transaction]:
         """Generate a deterministic list of canonical transactions.
         
-        Must be deterministic. Do NOT rely on Python hash ordering, wall-clock time,
-        random UUIDs, or DB ordering.
+        Architectural invariant:
+            Repeated invocations of generate() with identical configuration
+            must return the exact same ordered transaction sequence.
+            Do NOT rely on Python hash ordering, wall-clock time,
+            random UUIDs, or database ordering.
         """
         pass
+
