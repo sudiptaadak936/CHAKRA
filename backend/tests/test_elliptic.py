@@ -14,13 +14,13 @@ import pytest
 
 import sys
 
-SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "scripts"
-BACKEND_SCRIPTS_DIR = Path(__file__).resolve().parents[1] / "scripts"
+SCRIPTS_DIR_HOST = Path(__file__).resolve().parents[2] / "scripts"
+SCRIPTS_DIR_CONTAINER = Path(__file__).resolve().parents[1] / "scripts"
 
 
 def load_validate_elliptic():
     import importlib
-    for d in [str(SCRIPTS_DIR), str(BACKEND_SCRIPTS_DIR)]:
+    for d in [str(SCRIPTS_DIR_HOST), str(SCRIPTS_DIR_CONTAINER)]:
         if Path(d).exists() and d not in sys.path:
             sys.path.insert(0, d)
     import validate_elliptic

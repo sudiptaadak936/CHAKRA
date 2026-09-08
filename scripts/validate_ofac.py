@@ -3,8 +3,8 @@
 CHAKRA Step 0.5 — OFAC SDN Enhanced Dataset Validation Script
 
 Validates the OFAC Specially Designated Nationals (SDN) Enhanced XML dataset,
-extracts cryptocurrency identifiers, and writes processed output and provenance
-metadata.
+extracts cryptocurrency identifiers with true containing-entity relationships,
+and writes processed output and provenance metadata.
 
 Source: https://ofac.treasury.gov/specially-designated-nationals-list-data-formats-data-schemas
 File:   data/ofac/raw/sdn_enhanced.zip
@@ -18,9 +18,12 @@ Outputs:
 
 IMPORTANT:
     The raw ZIP file is never modified.
-    All extracted records carry provenance linking back to the source.
+    Each record associates the digital currency feature with its containing <entity>.
+    The containing entity ID is preserved as `entity_id` (and aliased as `sdn_id`).
+    The individual cryptocurrency feature ID is preserved as `feature_id`.
+    Entity names are extracted from the containing entity's identity elements.
     Crypto addresses are identified from explicit 'Digital Currency Address'
-    remarks in the SDN data — never inferred from names or postal addresses.
+    feature records in the SDN data — never inferred from names or postal addresses.
 """
 
 import hashlib
@@ -40,13 +43,6 @@ RAW_DIR = PROJECT_ROOT / "data" / "ofac" / "raw"
 PROCESSED_DIR = PROJECT_ROOT / "data" / "ofac" / "processed"
 METADATA_DIR = PROJECT_ROOT / "data" / "ofac" / "metadata"
 ZIP_PATH = RAW_DIR / "sdn_enhanced.zip"
-
-# OFAC XML namespaces used in sdn_enhanced.xml
-# The Enhanced dataset uses version 2.x of the OFAC SDN schema
-OFAC_NS_PREFIXES = [
-    "https://sanctionslistservice.ofac.treas.gov/api/PublicationPreview/exports/ENHANCED",
-    "http://tempuri.org/",
-]
 
 # Feature type names that indicate a digital currency address in the SDN Enhanced schema
 CRYPTO_FEATURE_TYPES = {
@@ -100,14 +96,28 @@ def strip_ns(tag: str) -> str:
     return tag
 
 
+def is_crypto_feature_type(ftype: str | None) -> bool:
+    """Determine whether a feature type represents a cryptocurrency address."""
+    if not ftype:
+        return False
+    ft = ftype.strip()
+    return ft in CRYPTO_FEATURE_TYPES or ft.startswith("Digital Currency Address")
+
+
 def extract_crypto_addresses(xml_bytes: bytes) -> list[dict]:
     """Parse the SDN Enhanced XML and extract digital currency address records.
 
-    Handles the OFAC Enhanced XML schema where features are stored under:
-      sanctionsData/sanctions/party/feature
-    with direct <type> and <value> children.
+    Handles:
+    1. The actual OFAC Enhanced XML schema (root: sanctionsData), where entities
+       are structured as:
+         sanctionsData -> entities -> entity (id=...)
+           -> generalInfo -> entityType
+           -> names -> name -> isPrimary, formattedFullName/formattedLastName
+           -> features -> feature (id=...) -> type, value
+       Extracts entity_id from the containing entity, feature_id from the feature,
+       and the primary or fallback formatted name.
 
-    Also handles the older sdnList/sdnEntry/featureList structure.
+    2. The legacy sdnList/sdnEntry schema for backward-compatibility with older tests.
 
     Returns a list of dicts with provenance fields. Never infers addresses
     from names or postal address fields.
@@ -120,85 +130,99 @@ def extract_crypto_addresses(xml_bytes: bytes) -> list[dict]:
         print(f"  [ERROR] XML parse error: {exc}", file=sys.stderr)
         return records
 
-    def tag_name(element) -> str:
-        return strip_ns(element.tag)
+    # -----------------------------------------------------------------------
+    # Strategy 1: OFAC Enhanced XML Schema (<entity> elements)
+    # -----------------------------------------------------------------------
+    for entity in root.iter():
+        if strip_ns(entity.tag) != "entity":
+            continue
 
-    # -----------------------------------------------------------------------
-    # Strategy 1: OFAC Enhanced XML schema (sanctionsData root)
-    # Features are <feature id="..."><type featureTypeId="...">...</type><value>...</value>
-    # Party info is under <party id="..."><profile><identity>...</identity></profile></party>
-    # -----------------------------------------------------------------------
-    def parse_enhanced_schema(root) -> list[dict]:
-        extracted = []
-        # Build a lookup of party id -> name for provenance
-        party_names: dict[str, str] = {}
-        for party in root.iter():
-            if tag_name(party) != "party":
-                continue
-            party_id = party.get("id", "")
-            # Find a name: look for primaryName or any aliasName
-            for elem in party.iter():
-                t = tag_name(elem)
-                if t in ("lastName", "firstName", "name", "primaryName", "wholeName"):
-                    if elem.text and elem.text.strip():
-                        party_names[party_id] = elem.text.strip()
+        entity_id = entity.get("id")
+        entity_name = None
+        entity_type = None
+
+        primary_name = None
+        fallback_name = None
+
+        names_elem = None
+        features_elem = None
+
+        for child in entity:
+            ctag = strip_ns(child.tag)
+            if ctag == "names":
+                names_elem = child
+            elif ctag == "features":
+                features_elem = child
+            elif ctag == "generalInfo":
+                for gc in child:
+                    if strip_ns(gc.tag) == "entityType":
+                        entity_type = gc.text.strip() if gc.text else None
+
+        if names_elem is not None:
+            for name_entry in names_elem:
+                is_primary = False
+                entry_name = None
+                for nc in name_entry:
+                    if strip_ns(nc.tag) == "isPrimary" and nc.text and nc.text.strip().lower() == "true":
+                        is_primary = True
+                for nc in name_entry.iter():
+                    nctag = strip_ns(nc.tag)
+                    if nctag == "formattedFullName" and nc.text and nc.text.strip():
+                        entry_name = nc.text.strip()
                         break
+                    elif nctag in ("formattedLastName", "value") and nc.text and nc.text.strip() and not entry_name:
+                        entry_name = nc.text.strip()
+                if entry_name:
+                    if is_primary and not primary_name:
+                        primary_name = entry_name
+                    elif not fallback_name:
+                        fallback_name = entry_name
 
-        # Now find all features that are crypto addresses
-        for feature in root.iter():
-            if tag_name(feature) != "feature":
-                continue
+        # Fallback if no names element
+        if not primary_name and not fallback_name:
+            for elem in entity.iter():
+                etag = strip_ns(elem.tag)
+                if etag in ("name", "lastName", "primaryName") and elem.text and elem.text.strip():
+                    fallback_name = elem.text.strip()
+                    break
 
-            feature_type = None
-            feature_value = None
+        entity_name = primary_name or fallback_name or None
 
-            for child in feature:
-                t = tag_name(child)
-                if t == "type":
-                    feature_type = child.text
-                elif t == "value":
-                    feature_value = child.text
+        # Process features within this containing entity
+        feature_containers = [features_elem] if features_elem is not None else [entity]
+        for container in feature_containers:
+            for feat in container.iter():
+                if strip_ns(feat.tag) != "feature":
+                    continue
+                feat_id = feat.get("id")
+                ftype = None
+                fval = None
+                for fc in feat:
+                    fctag = strip_ns(fc.tag)
+                    if fctag == "type":
+                        ftype = fc.text.strip() if fc.text else None
+                    elif fctag == "value":
+                        fval = fc.text.strip() if fc.text else None
 
-            if not feature_type or not feature_value:
-                continue
-
-            feature_type = feature_type.strip()
-            feature_value = feature_value.strip()
-
-            if not feature_value:
-                continue
-
-            # Only extract genuine crypto address features
-            is_crypto = (
-                feature_type in CRYPTO_FEATURE_TYPES
-                or feature_type.startswith("Digital Currency Address")
-            )
-            if not is_crypto:
-                continue
-
-            # Try to find containing party id for provenance
-            sdn_id = feature.get("id", "")
-            # Walk up isn't available in ElementTree; we'll use the feature id
-            entity_name = None
-
-            extracted.append({
-                "sdn_id": sdn_id,
-                "entity_name": entity_name,
-                "sdn_type": None,
-                "feature_type": feature_type,
-                "address": feature_value,
-                "source": "OFAC SDN Enhanced List",
-                "provenance": "Directly extracted from OFAC SDN Enhanced XML; not inferred.",
-            })
-        return extracted
+                if ftype and is_crypto_feature_type(ftype) and fval:
+                    records.append({
+                        "entity_id": str(entity_id) if entity_id is not None else None,
+                        "sdn_id": str(entity_id) if entity_id is not None else None,  # backward compatibility
+                        "feature_id": str(feat_id) if feat_id is not None else None,
+                        "entity_name": entity_name,
+                        "entity_type": entity_type,
+                        "feature_type": ftype,
+                        "address": fval,
+                        "source": "OFAC SDN Enhanced List",
+                        "provenance": "Directly extracted from OFAC SDN Enhanced XML; not inferred.",
+                    })
 
     # -----------------------------------------------------------------------
-    # Strategy 2: Older sdnList/sdnEntry schema
+    # Strategy 2: Legacy sdnList/sdnEntry Schema (fallback)
     # -----------------------------------------------------------------------
-    def parse_sdn_list_schema(root) -> list[dict]:
-        extracted = []
+    if not records:
         for entry in root.iter():
-            if tag_name(entry) != "sdnEntry":
+            if strip_ns(entry.tag) != "sdnEntry":
                 continue
 
             sdn_id = None
@@ -206,60 +230,43 @@ def extract_crypto_addresses(xml_bytes: bytes) -> list[dict]:
             sdn_type = None
 
             for child in entry:
-                t = tag_name(child)
-                if t == "uid":
-                    sdn_id = child.text
-                elif t == "lastName":
-                    entity_name = child.text
-                elif t == "sdnType":
-                    sdn_type = child.text
+                ctag = strip_ns(child.tag)
+                if ctag == "uid":
+                    sdn_id = child.text.strip() if child.text else None
+                elif ctag == "lastName":
+                    entity_name = child.text.strip() if child.text else None
+                elif ctag == "sdnType":
+                    sdn_type = child.text.strip() if child.text else None
 
-            for feature in entry.iter():
-                if tag_name(feature) != "feature":
+            for feat in entry.iter():
+                if strip_ns(feat.tag) != "feature":
                     continue
 
-                feature_type = None
-                for fc in feature:
-                    if tag_name(fc) == "featureType":
-                        feature_type = fc.text
+                feat_id = feat.get("id")
+                ftype = None
+                for fc in feat:
+                    if strip_ns(fc.tag) == "featureType":
+                        ftype = fc.text.strip() if fc.text else None
                         break
-                if not feature_type:
+
+                if not ftype or not is_crypto_feature_type(ftype):
                     continue
 
-                is_crypto = (
-                    feature_type in CRYPTO_FEATURE_TYPES
-                    or feature_type.startswith("Digital Currency Address")
-                )
-                if not is_crypto:
-                    continue
-
-                for version in feature.iter():
-                    if tag_name(version) != "detail":
-                        continue
-                    address_value = version.text
-                    if address_value and address_value.strip():
-                        extracted.append({
-                            "sdn_id": sdn_id,
+                for ver in feat.iter():
+                    if strip_ns(ver.tag) == "detail" and ver.text and ver.text.strip():
+                        records.append({
+                            "entity_id": str(sdn_id) if sdn_id is not None else None,
+                            "sdn_id": str(sdn_id) if sdn_id is not None else None,
+                            "feature_id": str(feat_id) if feat_id is not None else None,
                             "entity_name": entity_name,
-                            "sdn_type": sdn_type,
-                            "feature_type": feature_type,
-                            "address": address_value.strip(),
+                            "entity_type": sdn_type,
+                            "feature_type": ftype,
+                            "address": ver.text.strip(),
                             "source": "OFAC SDN Enhanced List",
                             "provenance": "Directly extracted from OFAC SDN Enhanced XML; not inferred.",
                         })
-        return extracted
-
-    root_tag = tag_name(root)
-    if root_tag == "sanctionsData":
-        records = parse_enhanced_schema(root)
-    else:
-        # Fallback to both strategies
-        records = parse_enhanced_schema(root)
-        if not records:
-            records = parse_sdn_list_schema(root)
 
     return records
-
 
 
 def main() -> int:
@@ -349,6 +356,8 @@ def main() -> int:
     processed_data = {
         "description": (
             "Digital currency addresses extracted from the OFAC SDN Enhanced dataset. "
+            "Each record maps a cryptocurrency feature (feature_id) to its containing "
+            "SDN entity (entity_id, aliased as sdn_id for backward compatibility) and primary entity name. "
             "All records carry direct provenance to the source XML. "
             "Addresses are NEVER inferred from names or postal addresses."
         ),
@@ -369,8 +378,7 @@ def main() -> int:
     # ------------------------------------------------------------------
     print("\n[6] Writing metadata...")
 
-    # Count distinct SDN IDs with crypto addresses
-    distinct_sdn_ids = len({r["sdn_id"] for r in crypto_records if r["sdn_id"]})
+    distinct_entity_ids = len({r["entity_id"] for r in crypto_records if r.get("entity_id")})
 
     # Currency type summary for metadata
     type_summary = {}
@@ -393,13 +401,14 @@ def main() -> int:
         "errors": errors,
         "record_counts": {
             "total_crypto_address_records": len(crypto_records),
-            "distinct_sdn_entries_with_crypto": distinct_sdn_ids,
+            "distinct_entities_with_crypto": distinct_entity_ids,
+            "distinct_sdn_entries_with_crypto": distinct_entity_ids,
             "by_currency_type": type_summary,
         },
         "schema_notes": (
-            "SDN Enhanced XML schema v2.x. Crypto addresses are stored as "
-            "'Digital Currency Address - <TICKER>' feature types within <featureList> "
-            "elements of each <sdnEntry>."
+            "SDN Enhanced XML schema. Cryptocurrency addresses are stored as "
+            "<feature id='...'> elements under containing <entity id='...'> records, "
+            "with <type> starting with 'Digital Currency Address' and <value> containing the address."
         ),
         "license_note": (
             "OFAC SDN data is a U.S. government publication and is in the public domain. "

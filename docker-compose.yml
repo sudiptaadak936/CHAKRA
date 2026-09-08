@@ -64,6 +64,8 @@ services:
     restart: unless-stopped
     ports:
       - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./scripts:/app/scripts:ro
     environment:
       - POSTGRES_DB=${POSTGRES_DB:-chakra_db}
       - POSTGRES_USER=${POSTGRES_USER:-chakra_user}

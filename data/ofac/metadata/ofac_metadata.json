@@ -14,12 +14,13 @@
     }
   ],
   "primary_xml_file": "SDN_ENHANCED.XML",
-  "processed_at": "2026-09-03T16:48:52.919563+00:00",
+  "processed_at": "2026-09-03T20:17:29.820743+00:00",
   "processing_status": "complete",
   "errors": [],
   "record_counts": {
     "total_crypto_address_records": 1007,
-    "distinct_sdn_entries_with_crypto": 1007,
+    "distinct_entities_with_crypto": 98,
+    "distinct_sdn_entries_with_crypto": 98,
     "by_currency_type": {
       "Digital Currency Address - TRX": 202,
       "Digital Currency Address - XMR": 11,
@@ -43,6 +44,6 @@
       "Digital Currency Address - BNB": 1
     }
   },
-  "schema_notes": "SDN Enhanced XML schema v2.x. Crypto addresses are stored as 'Digital Currency Address - <TICKER>' feature types within <featureList> elements of each <sdnEntry>.",
+  "schema_notes": "SDN Enhanced XML schema. Cryptocurrency addresses are stored as <feature id='...'> elements under containing <entity id='...'> records, with <type> starting with 'Digital Currency Address' and <value> containing the address.",
   "license_note": "OFAC SDN data is a U.S. government publication and is in the public domain. Re-use is permitted. Attribution to OFAC/Treasury is recommended."
 }

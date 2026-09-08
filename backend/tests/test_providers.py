@@ -24,6 +24,7 @@ class TestProviderConfig:
             "SOLSCAN_API_KEY", "CHAINABUSE_API_KEY",
         ]:
             monkeypatch.delenv(var, raising=False)
+        monkeypatch.setenv("CHAKRA_DISABLE_ENV_FILE", "1")
 
         # Re-import settings with clean environment
         from importlib import reload
@@ -355,6 +356,7 @@ class TestProviderServiceAggregation:
             "SOLSCAN_API_KEY", "CHAINABUSE_API_KEY",
         ]:
             monkeypatch.delenv(var, raising=False)
+        monkeypatch.setenv("CHAKRA_DISABLE_ENV_FILE", "1")
 
         from importlib import reload
         import app.core.config as cfg_mod
