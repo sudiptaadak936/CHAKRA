@@ -11,7 +11,7 @@ from app.scenarios.registry import (
     ScenarioRegistry,
     scenario_registry,
 )
-from app.scenarios.stubs import (
+from app.scenarios.demo import (
     CrossChainHopGenerator,
     FanInGenerator,
     MixerInteractionGenerator,
@@ -168,12 +168,17 @@ def test_canonical_scenarios_exact_set_and_classes():
 
 
 @pytest.mark.parametrize("scenario_id,cls", CANONICAL_SCENARIOS)
-def test_each_stub_raises_not_implemented_error(scenario_id, cls):
-    """Calling generate() on any of the 6 canonical stubs must raise NotImplementedError."""
+def test_each_generator_produces_valid_transactions(scenario_id, cls):
+    """Calling generate() on any of the 6 canonical scenarios must return valid Transactions."""
     gen = scenario_registry.get(scenario_id)
-    with pytest.raises(NotImplementedError) as exc_info:
-        gen.generate()
-    assert scenario_id in str(exc_info.value)
+    txs = gen.generate()
+    assert isinstance(txs, list)
+    assert len(txs) > 0
+    for tx in txs:
+        assert isinstance(tx, Transaction)
+        assert tx.transaction_id is not None
+        assert tx.provenance is not None
+        assert tx.provenance.normalized_at is not None
 
 
 # ---------------------------------------------------------------------------

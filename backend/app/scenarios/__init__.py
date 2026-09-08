@@ -6,7 +6,7 @@ from app.scenarios.registry import (
     ScenarioRegistry,
     scenario_registry,
 )
-from app.scenarios.stubs import (
+from app.scenarios.demo import (
     CrossChainHopGenerator,
     FanInGenerator,
     MixerInteractionGenerator,
