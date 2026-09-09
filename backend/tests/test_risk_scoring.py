@@ -255,8 +255,37 @@ def test_deterministic_hash():
     assert result1.deterministic_hash == result2.deterministic_hash
 
 def test_deterministic_repeated_evaluation():
-    # Like test_deterministic_hash, ensure multiple runs produce identical scores
-    pass
+    hit = SanctionedAddressHit(
+        chain=Chain.EVM,
+        address="0xabc",
+        source="official",
+        evidence_id="ofac-123",
+        reason="Sanctioned"
+    )
+    typo = TypologyDetection(
+        detection_id="peel-123",
+        typology_type=TypologyType.PEEL_CHAIN,
+        chain="evm",
+        confidence_level="observed",
+        explanation="Peel chain detected."
+    )
+    results = [
+        RiskEngine.evaluate(
+            target_address="0xabc",
+            chain=Chain.EVM,
+            network="ethereum-mainnet",
+            sanctions_hits=[hit],
+            typologies=[typo],
+        )
+        for _ in range(20)
+    ]
+    first = results[0]
+    for r in results[1:]:
+        assert r.overall_score == first.overall_score
+        assert r.risk_level == first.risk_level
+        assert r.deterministic_hash == first.deterministic_hash
+        assert len(r.components) == len(first.components)
+        assert r.components[0].score_contribution == first.components[0].score_contribution
 
 def test_synthetic_evidence_excluded():
     hit = SanctionedAddressHit(
@@ -332,7 +361,38 @@ def test_invalid_chain_fails_closed():
         )
 
 def test_numeric_edge_cases():
-    pass
+    # Exact threshold boundaries
+    assert RiskEngine._determine_risk_level(80.0) == RiskLevel.CRITICAL
+    assert RiskEngine._determine_risk_level(60.0) == RiskLevel.HIGH
+    assert RiskEngine._determine_risk_level(35.0) == RiskLevel.MEDIUM
+    assert RiskEngine._determine_risk_level(10.0) == RiskLevel.LOW
+    assert RiskEngine._determine_risk_level(9.99) == RiskLevel.NEUTRAL
+    assert RiskEngine._determine_risk_level(0.0) == RiskLevel.NEUTRAL
+
+    # Saturation beyond 100 clamped to 100.0
+    hit = SanctionedAddressHit(
+        chain=Chain.EVM,
+        address="0xabc",
+        source="official",
+        evidence_id="ofac-123",
+        reason="Sanctioned"
+    )
+    typo = TypologyDetection(
+        detection_id="peel-1",
+        typology_type=TypologyType.PEEL_CHAIN,
+        chain="evm",
+        confidence_level="observed",
+        explanation="Peel chain detected."
+    )
+    result = RiskEngine.evaluate(
+        target_address="0xabc",
+        chain=Chain.EVM,
+        network="ethereum-mainnet",
+        sanctions_hits=[hit],
+        typologies=[typo]
+    )
+    assert result.overall_score == 100.0
+    assert result.risk_level == RiskLevel.CRITICAL
 
 def test_explanation_contains_real_evidence_ids():
     typo = TypologyDetection(
@@ -388,6 +448,11 @@ def test_no_wall_clock_influence_on_score():
     assert result1.overall_score == result2.overall_score
 
 def test_internal_error_does_not_yield_partial_score():
-    # Handled via strict fail-closed (exceptions) in the code
-    pass
+    # Calling with empty or invalid address fails closed with exception
+    with pytest.raises(ValueError):
+        RiskEngine.evaluate(target_address="   ", chain=Chain.EVM, network="ethereum-mainnet")
+    with pytest.raises(ValueError):
+        RiskEngine.evaluate(target_address="0xabc", chain="", network="ethereum-mainnet")
+    with pytest.raises(ValueError):
+        RiskEngine.evaluate(target_address="0xabc", chain=Chain.EVM, network="")
 
