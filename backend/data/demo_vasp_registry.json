@@ -1,0 +1,38 @@
+[
+  {
+    "address": "0x28c6c06298d514db089934071355e220b5de8326",
+    "chain": "evm",
+    "vasp_name": "Binance",
+    "service_type": "exchange",
+    "source": "public_tag",
+    "evidence_id": "tag-001",
+    "metadata": {"description": "Binance 14 Hot Wallet"}
+  },
+  {
+    "address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    "chain": "bitcoin",
+    "vasp_name": "Genesis",
+    "service_type": "miner",
+    "source": "genesis_block",
+    "evidence_id": "genesis-001",
+    "metadata": {"note": "Satoshi Nakamoto"}
+  },
+  {
+    "address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    "chain": "bitcoin",
+    "vasp_name": "Unknown",
+    "service_type": "unknown",
+    "source": "heuristic_analysis",
+    "evidence_id": "heur-002",
+    "metadata": {"confidence": 0.2}
+  },
+  {
+    "address": "TG3XXyExBkPp9nzdajDZsozErT48TXYA2i",
+    "chain": "tron",
+    "vasp_name": "Tether",
+    "service_type": "token_issuer",
+    "source": "official_registry",
+    "evidence_id": "reg-004",
+    "metadata": {"description": "Tether USD Smart Contract"}
+  }
+]
