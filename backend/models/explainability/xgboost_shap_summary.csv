@@ -1,0 +1,10 @@
+feature,mean_abs_shap
+elliptic_feature_6,1.3737638
+elliptic_feature_3,1.1106972
+elliptic_feature_2,0.91039115
+elliptic_feature_5,0.7204373
+elliptic_feature_1_time,0.6822441
+elliptic_feature_4,0.592333
+in_degree,0.11872573
+transaction_degree,0.066103004
+out_degree,0.04052108

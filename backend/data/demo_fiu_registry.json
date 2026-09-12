@@ -1,0 +1,46 @@
+﻿{
+  "_metadata": {
+    "data_classification": "DEMONSTRATION_ONLY",
+    "disclaimer": "THIS IS DEMONSTRATION DATA. These records are entirely fabricated for prototype testing purposes. They do NOT represent real FIU-IND registrations, real VASP legal identities, real regulatory status, or any real government data. Do NOT rely on this data for any compliance, legal, or investigative purpose.",
+    "source": "CHAKRA_PROTOTYPE_STUB",
+    "schema_version": "1.0.0"
+  },
+  "vasps": [
+    {
+      "re_id": "FIU-DEMO-IN-001",
+      "vasp_name": "Binance",
+      "registration_status": "REGISTERED",
+      "registered_jurisdiction": "IN",
+      "registration_date": "2023-03-15",
+      "compliance_officer_contact": "DEMO_NOT_REAL@example.invalid",
+      "notes": "DEMONSTRATION RECORD - NOT REAL FIU-IND DATA"
+    },
+    {
+      "re_id": "FIU-DEMO-IN-002",
+      "vasp_name": "WazirX",
+      "registration_status": "REGISTERED",
+      "registered_jurisdiction": "IN",
+      "registration_date": "2023-04-01",
+      "compliance_officer_contact": "DEMO_NOT_REAL@example.invalid",
+      "notes": "DEMONSTRATION RECORD - NOT REAL FIU-IND DATA"
+    },
+    {
+      "re_id": null,
+      "vasp_name": "DarkExchange_Demo",
+      "registration_status": "NOT_REGISTERED",
+      "registered_jurisdiction": null,
+      "registration_date": null,
+      "compliance_officer_contact": null,
+      "notes": "DEMONSTRATION RECORD - Fabricated unregistered VASP for prototype testing. NOT REAL."
+    },
+    {
+      "re_id": null,
+      "vasp_name": "Tether",
+      "registration_status": "NOT_REGISTERED",
+      "registered_jurisdiction": null,
+      "registration_date": null,
+      "compliance_officer_contact": null,
+      "notes": "DEMONSTRATION RECORD - NOT REAL FIU-IND DATA. Tether actual regulatory status may differ."
+    }
+  ]
+}
