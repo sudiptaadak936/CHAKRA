@@ -1,0 +1,50 @@
+{
+  "model_name": "Isolation Forest Anomaly Detector",
+  "model_version": "1.0",
+  "dataset_name": "Elliptic Bitcoin Dataset",
+  "training_type": "unsupervised",
+  "sklearn_version": "1.6.1",
+  "feature_schema_type": "ELLIPTIC_PROTOTYPE_PROXY",
+  "feature_schema_description": "Features derived from the Elliptic Bitcoin dataset for prototype ML training. Elliptic features are proxy variables and are not equivalent to live CHAKRA multi-chain engineered features.",
+  "limitations": "The current models are trained using the ELLIPTIC_PROTOTYPE_PROXY schema. A dedicated CHAKRA feature-adapter layer is required before these models can safely consume live blockchain data. Production deployment must validate that the live feature semantics match the training feature schema or retrain the models using genuinely engineered CHAKRA features.",
+  "production_chakra_features_deferred": [
+    "transaction_volume",
+    "transaction_count",
+    "wallet_age",
+    "in_degree",
+    "out_degree",
+    "transaction_degree",
+    "hop_distance_to_exchange",
+    "hop_distance_to_mixer",
+    "cluster_size",
+    "amount_retention_ratio",
+    "inter_hop_velocity",
+    "bridge_hop_count",
+    "mixer_exposure",
+    "exchange_exposure",
+    "cross_chain_hop_count"
+  ],
+  "target_definition": "1 = illicit, 0 = licit",
+  "random_seed": 42,
+  "training_date": "2026-09-12T16:37:02.436104",
+  "contamination": 0.0975946493219611,
+  "feature_names": [
+    "in_degree",
+    "out_degree",
+    "transaction_degree",
+    "elliptic_feature_1_time",
+    "elliptic_feature_2",
+    "elliptic_feature_3",
+    "elliptic_feature_4",
+    "elliptic_feature_5",
+    "elliptic_feature_6"
+  ],
+  "feature_count": 9,
+  "training_samples": 32594,
+  "metrics": {
+    "accuracy": 0.8034359341445956,
+    "precision": 0.012693935119887164,
+    "recall": 0.013196480938416423,
+    "f1": 0.012940330697340043
+  }
+}

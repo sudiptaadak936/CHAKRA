@@ -27,6 +27,9 @@ class SahyogEscalationPacket(BaseModel):
     evidence_ids: List[str]
     provenance: AttributionProvenance
     reason: str
+    # Advisory recommended action for human investigator review.
+    # This does NOT trigger any automated escalation or government submission.
+    recommended_action: Optional[str] = None
 
     model_config = {"frozen": True}
 
