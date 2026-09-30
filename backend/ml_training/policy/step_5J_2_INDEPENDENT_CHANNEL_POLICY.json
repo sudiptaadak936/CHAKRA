@@ -1,0 +1,128 @@
+{
+  "contract_version": "1.0.0",
+  "policy_status": "FROZEN",
+  "policy_name": "STEP_5J_2_INDEPENDENT_CHANNEL_POLICY",
+  "architecture": "INDEPENDENT_CHANNELS",
+  "numerical_fusion_enabled": false,
+  "ml_affects_deterministic_score": false,
+  "ml_affects_deterministic_level": false,
+  "lr_xgb_ensemble_enabled": false,
+  "probability_to_points_mapping": null,
+  "operational_ml_threshold": null,
+  "sanctions_override_by_ml": false,
+  "deterministic_channel": {
+    "status": "ACTIVE_AUTHORITATIVE",
+    "score_range": [0.0, 100.0],
+    "scoring_semantics": "UNCHANGED",
+    "sanctions_behavior": "UNCHANGED",
+    "sanctions_hit_points": 100.0,
+    "sanctions_override_by_ml": false,
+    "ml_affects_deterministic_score": false,
+    "ml_affects_deterministic_level": false,
+    "ml_attenuates_deterministic_evidence": false,
+    "typology_weights": {
+      "PEEL_CHAIN": 25.0,
+      "RAPID_HOPPING": 20.0,
+      "FAN_IN": 15.0,
+      "FAN_OUT": 15.0
+    },
+    "ineligible_typologies": [
+      "MIXER_INTERACTION",
+      "CROSS_CHAIN"
+    ],
+    "risk_level_thresholds": {
+      "CRITICAL": 80.0,
+      "HIGH": 60.0,
+      "MEDIUM": 35.0,
+      "LOW": 10.0
+    },
+    "governing_policy": "STEP_5_DETERMINISTIC_RISK_POLICY_v1.0.0"
+  },
+  "ml_channel": {
+    "status": "ACTIVE_INDEPENDENT_ANALYTICAL_LAYER",
+    "service": "Step 5I AddressMLInferenceService",
+    "outputs": [
+      "lr_raw_probability",
+      "lr_calibrated_probability",
+      "xgb_raw_probability",
+      "xgb_calibrated_probability"
+    ],
+    "feature_schema_version": "1.1.0",
+    "signal_nature": "Statistical analytical reference signals only. Not probabilities of criminality, intent, ownership, or legal culpability."
+  },
+  "numerical_fusion": {
+    "numerical_fusion_enabled": false,
+    "fusion_status": "NOT_CONFIGURED",
+    "fusion_score": null,
+    "fusion_policy_version": null,
+    "probability_to_points_mapping": null,
+    "governance_rationale": "Empirical support in development cohort contains zero sanctions-free positives (all 66 positive records are OFAC-sanctioned, deterministic score saturated at 100). The mathematical finding alpha=0 is a saturation artifact and ML incremental value is non-identifiable on current data. Independent channels preserved for safety."
+  },
+  "model_combination": {
+    "lr_xgb_ensemble_enabled": false,
+    "ensemble_weights": null,
+    "combination_operator": null,
+    "selection_status": "NO_WINNER_SELECTED",
+    "model_selection_policy": "Both Logistic Regression and XGBoost are presented as independent analytical perspectives; no model is selected as the exclusive operational winner."
+  },
+  "threshold_policy": {
+    "operational_ml_threshold": null,
+    "risk_level_mapping_allowed": false,
+    "diagnostic_eval_threshold": 0.5,
+    "diagnostic_eval_scope": "HISTORICAL_EVALUATION_ONLY",
+    "policy_statement": "No operational ML threshold is authorized. ML probabilities must not be mapped to CRITICAL, HIGH, MEDIUM, or LOW risk bands."
+  },
+  "sanctions_policy": {
+    "sanctions_override_by_ml": false,
+    "sanctions_precedence": "STRICT_DETERMINISTIC_OVERRIDE",
+    "deterministic_sanctions_points": 100.0,
+    "policy_statement": "Within CHAKRA's deterministic risk policy, a verified sanctions match has strict deterministic precedence and cannot be overridden, attenuated, or dismissed by ML."
+  },
+  "provenance_policy": {
+    "deterministic_policy_version": "STEP_5_DETERMINISTIC_RISK_POLICY_v1.0.0",
+    "ml_freeze_identity": "STEP_5H_7_FINAL_FREEZE",
+    "feature_schema_version": "1.1.0",
+    "model_artifacts": {
+      "logistic_regression": {
+        "filename": "logistic_regression_final.joblib",
+        "sha256": "569bbca10c392f06b262a5c0cb7ae5209a34ecc92a852ff93ed2e576b2f86bac"
+      },
+      "xgboost": {
+        "filename": "xgboost_final.json",
+        "sha256": "e320eb085b2d091bb202d03261cbc15683ede51070c152313cd211ba13575397"
+      }
+    },
+    "calibrator_artifacts": {
+      "logistic_regression": {
+        "filename": "lr_calibrator.joblib",
+        "sha256": "1e78b493577a03884a4ddcaaf4488cf507f6448aaf16c9eb865f337f513a98df"
+      },
+      "xgboost": {
+        "filename": "xgb_calibrator.joblib",
+        "sha256": "90d61a4a7cc91442e58104bb9e7fa9c57c0554df13a55b034fef4fe7ab00aad2"
+      }
+    },
+    "preprocessor_artifact": {
+      "filename": "final_preprocessor_params.json",
+      "sha256": "8b6a44e10e0c3b47f7c887f95cc12022aaa206db2c0d6a643cc0f72d5c60e3d5"
+    }
+  },
+  "fail_closed_policy": {
+    "deterministic_risk_unavailable": "FAIL_CLOSED_PER_RISK_ENGINE_CONTRACT",
+    "ml_unavailable": "DEGRADED_INDEPENDENT_DETERMINISTIC_OPERATIONAL",
+    "numerical_fusion_requested_while_disabled": "RETURN_EXPLICIT_NOT_CONFIGURED",
+    "unsupported_policy_version": "FAIL_CLOSED_RAISE_EXCEPTION",
+    "incompatible_provenance": "FAIL_CLOSED_RAISE_ARTIFACT_INTEGRITY_ERROR"
+  },
+  "future_fusion_requirements": {
+    "re_evaluation_condition": "Numerical fusion can only be reconsidered after a new independently validated expansion dataset provides sufficient empirical support.",
+    "required_support": [
+      "An adequately sized cohort of independent sanctions-free positive entities must be established through a separate prospective statistical support/power analysis before numerical fusion is reconsidered",
+      "Positive entities with non-zero intermediate deterministic scores (10 <= S_det <= 75) from observed typologies",
+      "Independent negative populations (ordinary retail/active users) to evaluate false-positive elevation",
+      "Point-in-time multi-transaction behavioral histories",
+      "Adequate independent support across relevant chain and source strata must be demonstrated before fusion validation"
+    ],
+    "final_test_isolation_rule": "The existing 9-entity final test set cannot be reused as fusion-tuning data and remains permanently evaluation-only."
+  }
+}
