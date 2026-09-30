@@ -1,0 +1,51 @@
+{
+  "record_count": 84,
+  "entity_count": 44,
+  "pos_count": 66,
+  "neg_count": 18,
+  "deterministic_score": {
+    "pos_mean": 100.0,
+    "neg_mean": 0.0,
+    "roc_auc": 1.0,
+    "ap": 1.0
+  },
+  "lr_calibrated": {
+    "pos_mean": 0.7378125302494093,
+    "neg_mean": 0.4025182020504466,
+    "pos_median": 0.7659070588666271,
+    "neg_median": 0.3698349455482339,
+    "roc_auc": 0.9806397306397306,
+    "ap": 0.9951089794535963
+  },
+  "xgb_calibrated": {
+    "pos_mean": 0.6888184412050027,
+    "neg_mean": 0.458187307729862,
+    "pos_median": 0.7116379377255595,
+    "neg_median": 0.45049819248270423,
+    "roc_auc": 0.9932659932659933,
+    "ap": 0.9982645426928775
+  },
+  "correlations": {
+    "det_vs_lr_cal": {
+      "pearson": 0.8655265452086345,
+      "spearman": 0.6832348365408454
+    },
+    "det_vs_xgb_cal": {
+      "pearson": 0.8865088490312223,
+      "spearman": 0.7107573217234251
+    },
+    "lr_cal_vs_xgb_cal": {
+      "pearson": 0.9475346251605362,
+      "spearman": 0.7132833406790349
+    }
+  },
+  "typology_overlap_study": {
+    "max_delta_lr_raw": 0.0,
+    "max_delta_lr_cal": 0.0,
+    "max_delta_xgb_raw": 0.0,
+    "max_delta_xgb_cal": 0.0,
+    "mean_delta_lr_cal": 0.0,
+    "mean_delta_xgb_cal": 0.0,
+    "explanation": "All 4 typology flags (peel_chain, rapid_hop, fan_in, fan_out) are 0.0 across the 84 development records, resulting in zero observed empirical shift when zeroed counterfactually. However, in prospective evaluation where typologies fire, an additive fusion model would double-count structural risk since typologies contribute 15-25 points in the deterministic engine and also serve as positive indicator inputs in the ML models."
+  }
+}

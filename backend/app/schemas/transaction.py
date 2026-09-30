@@ -96,6 +96,8 @@ class Transfer(BaseModel):
     decimals: Optional[int] = Field(None, ge=0, le=77)
     chain: Chain
     network: Network
+    timestamp: Optional[datetime] = None
+    transaction_id: Optional[str] = None
 
     @field_validator("asset_contract")
     @classmethod
@@ -103,6 +105,7 @@ class Transfer(BaseModel):
         return v
 
     model_config = {"frozen": True}
+
 
 
 # ---------------------------------------------------------------------------

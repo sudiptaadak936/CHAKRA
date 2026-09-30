@@ -1,0 +1,237 @@
+{
+  "n_outer_splits": 4,
+  "n_inner_splits": 3,
+  "fold_metrics": [
+    {
+      "outer_fold": 0,
+      "val_entities": 10,
+      "val_records": 21,
+      "val_pos": 17,
+      "val_neg": 4,
+      "selected_params": {
+        "alpha_b_lr": 0.0,
+        "alpha_b_xgb": 0.0,
+        "w_c": 0.0,
+        "alpha_c": 0.0,
+        "c_max_d": 10.0,
+        "alpha_d": 0.0,
+        "alpha_e": 0.0
+      }
+    },
+    {
+      "outer_fold": 1,
+      "val_entities": 10,
+      "val_records": 21,
+      "val_pos": 17,
+      "val_neg": 4,
+      "selected_params": {
+        "alpha_b_lr": 0.0,
+        "alpha_b_xgb": 0.0,
+        "w_c": 0.0,
+        "alpha_c": 0.0,
+        "c_max_d": 10.0,
+        "alpha_d": 0.0,
+        "alpha_e": 0.0
+      }
+    },
+    {
+      "outer_fold": 2,
+      "val_entities": 11,
+      "val_records": 21,
+      "val_pos": 16,
+      "val_neg": 5,
+      "selected_params": {
+        "alpha_b_lr": 0.0,
+        "alpha_b_xgb": 0.0,
+        "w_c": 0.0,
+        "alpha_c": 0.0,
+        "c_max_d": 10.0,
+        "alpha_d": 0.0,
+        "alpha_e": 0.0
+      }
+    },
+    {
+      "outer_fold": 3,
+      "val_entities": 13,
+      "val_records": 21,
+      "val_pos": 16,
+      "val_neg": 5,
+      "selected_params": {
+        "alpha_b_lr": 0.0,
+        "alpha_b_xgb": 0.0,
+        "w_c": 0.0,
+        "alpha_c": 0.0,
+        "c_max_d": 10.0,
+        "alpha_d": 0.0,
+        "alpha_e": 0.0
+      }
+    }
+  ],
+  "comparison_table": [
+    {
+      "candidate_id": "BASE_DET_ONLY",
+      "name": "Deterministic Risk Only (Step 5)",
+      "composite_score_exists": false,
+      "uses_lr": false,
+      "uses_xgb": false,
+      "roc_auc": 1.0,
+      "ap": 1.0,
+      "brier_score": 0.0,
+      "notes": "Positives are 100.0 (sanctions), Negatives are 0.0 (clean). Perfect benchmark on dev dataset."
+    },
+    {
+      "candidate_id": "BASE_LR_ONLY",
+      "name": "Logistic Regression Calibrated (Step 5I)",
+      "composite_score_exists": false,
+      "uses_lr": true,
+      "uses_xgb": false,
+      "roc_auc": 0.8510101010101011,
+      "ap": 0.9195160585404432,
+      "brier_score": 0.1466123618154276,
+      "notes": "Nested CV calibrated probability."
+    },
+    {
+      "candidate_id": "BASE_XGB_ONLY",
+      "name": "XGBoost Calibrated (Step 5I)",
+      "composite_score_exists": false,
+      "uses_lr": false,
+      "uses_xgb": true,
+      "roc_auc": 0.8156565656565656,
+      "ap": 0.937313523005402,
+      "brier_score": 0.16004612008571897,
+      "notes": "Nested CV calibrated probability."
+    },
+    {
+      "candidate_id": "CANDIDATE_A",
+      "name": "Independent Channels (Current Architecture)",
+      "composite_score_exists": false,
+      "uses_lr": true,
+      "uses_xgb": true,
+      "roc_auc": 1.0,
+      "ap": 1.0,
+      "brier_score": null,
+      "notes": "Retains deterministic score and both calibrated probabilities independently without synthesis."
+    },
+    {
+      "candidate_id": "CANDIDATE_B_LR",
+      "name": "Single-Model Additive Index (LR)",
+      "composite_score_exists": true,
+      "uses_lr": true,
+      "uses_xgb": false,
+      "learned_parameters": {
+        "parameter": "alpha",
+        "values_by_fold": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "median": 0.0,
+        "std": 0.0
+      },
+      "roc_auc": 1.0,
+      "ap": 1.0,
+      "brier_score": 0.0,
+      "notes": "Alpha values collapsed to zero in optimization because any addition to negatives degrades Brier score."
+    },
+    {
+      "candidate_id": "CANDIDATE_B_XGB",
+      "name": "Single-Model Additive Index (XGB)",
+      "composite_score_exists": true,
+      "uses_lr": false,
+      "uses_xgb": true,
+      "learned_parameters": {
+        "parameter": "alpha",
+        "values_by_fold": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean": 0.0,
+        "median": 0.0,
+        "std": 0.0
+      },
+      "roc_auc": 1.0,
+      "ap": 1.0,
+      "brier_score": 0.0,
+      "notes": "Alpha values collapsed to zero across folds."
+    },
+    {
+      "candidate_id": "CANDIDATE_C",
+      "name": "Convex ML Ensemble + Additive Fusion",
+      "composite_score_exists": true,
+      "uses_lr": true,
+      "uses_xgb": true,
+      "learned_parameters": {
+        "weight_lr_by_fold": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "weight_lr_mean": 0.0,
+        "alpha_by_fold": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "alpha_mean": 0.0
+      },
+      "roc_auc": 1.0,
+      "ap": 1.0,
+      "brier_score": 0.0,
+      "notes": "Ensemble weight unstable; alpha collapsed to boundary 0.0."
+    },
+    {
+      "candidate_id": "CANDIDATE_D",
+      "name": "Deterministic-Primary Bounded ML",
+      "composite_score_exists": true,
+      "uses_lr": true,
+      "uses_xgb": false,
+      "learned_parameters": {
+        "alpha_by_fold": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "alpha_mean": 0.0,
+        "c_max_by_fold": [
+          10.0,
+          10.0,
+          10.0,
+          10.0
+        ],
+        "c_max_mean": 10.0
+      },
+      "roc_auc": 1.0,
+      "ap": 1.0,
+      "brier_score": 0.0,
+      "notes": "Alpha collapsed to 0.0 in all folds; ML cap has zero effect."
+    },
+    {
+      "candidate_id": "CANDIDATE_E",
+      "name": "Historical Maximum-Floor Shape (Step 5G Proposal)",
+      "composite_score_exists": true,
+      "uses_lr": true,
+      "uses_xgb": false,
+      "learned_parameters": {
+        "alpha_by_fold": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "alpha_mean": 0.0,
+        "alpha_median": 0.0
+      },
+      "roc_auc": 1.0,
+      "ap": 1.0,
+      "brier_score": 0.0,
+      "notes": "Alpha collapsed to 0.0 because any non-zero floor degrades negative discrimination."
+    }
+  ]
+}

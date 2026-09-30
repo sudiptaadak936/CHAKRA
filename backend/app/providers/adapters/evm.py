@@ -187,11 +187,11 @@ class EVMTransactionAdapter(BaseDataProvider):
             "module": "account",
             "action": "txlist",
             "address": address,
-            "startblock": 0,
-            "endblock": 99999999,
+            "startblock": kwargs.get("startblock", 0),
+            "endblock": kwargs.get("endblock", 99999999),
             "page": (offset // limit) + 1 if limit > 0 else 1,
             "offset": limit,
-            "sort": "desc",
+            "sort": kwargs.get("sort", "desc"),
             "apikey": self._api_key,
         }
 

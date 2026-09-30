@@ -1,0 +1,24 @@
+{
+  "n_bootstraps": 1000,
+  "valid_resamples": 1000,
+  "chain_confounding": {
+    "evm": {
+      "total_records": 32,
+      "pos_records": 17,
+      "neg_records": 15,
+      "pos_rate": 0.53125
+    },
+    "bitcoin": {
+      "total_records": 52,
+      "pos_records": 49,
+      "neg_records": 3,
+      "pos_rate": 0.9423076923076923
+    }
+  },
+  "det_auc_ci_95": [
+    1.0,
+    1.0
+  ],
+  "collapse_to_boundary_frequency": 1.0,
+  "key_finding": "Because 100% of positive development records are OFAC SDN listed (yielding S_det = 100.0) and 100% of negative development records have S_det = 0.0, the deterministic risk score is an empirically perfect separator on the development dataset. Any additive, maximum, or composite fusion operator that adds positive points from ML probabilities to negatives inevitably increases their risk score, worsening the Brier score and false-positive elevation. Consequently, all mathematical optimization procedures collapse the ML weight alpha to 0.0."
+}
